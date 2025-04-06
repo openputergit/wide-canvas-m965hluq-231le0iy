@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        .custom-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .dropdown-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .dropdown-panel.active {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">HealthCare Portal</h1>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="hover:text-blue-200">Home</a>
+                <a href="#" class="hover:text-blue-200">About</a>
+                <a href="#" class="hover:text-blue-200">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 flex gap-6">
+        <!-- Left Panel -->
+        <div class="w-1/4 bg-white rounded-lg shadow p-4">
+            <div class="mb-6">
+                <button id="hospitalDropdown" class="w-full flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <span>Select Hospital</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div id="hospitalPanel" class="dropdown-panel mt-2">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="hospital1" data-hospital="Apollo Hospital">
+                        <label for="hospital1">Apollo Hospital</label>
+                    </div>
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="hospital2" data-hospital="Fortis Hospital">
+                        <label for="hospital2">Fortis Hospital</label>
+                    </div>
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="hospital3" data-hospital="Max Hospital">
+                        <label for="hospital3">Max Hospital</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <button id="packageDropdown" class="w-full flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <span>Select Package</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <div id="packagePanel" class="dropdown-panel mt-2">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="package1" data-package="Gold">
+                        <label for="package1">Gold Package</label>
+                    </div>
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="package2" data-package="Silver">
+                        <label for="package2">Silver Package</label>
+                    </div>
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="package3" data-package="Bronze">
+                        <label for="package3">Bronze Package</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div id="hospitalDetails" class="w-3/4 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Hospital cards will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const hospitalData = {
+            'Apollo Hospital': {
+                name: 'Apollo Hospital',
+                image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                packages: {
+                    Gold: {price: '$5000', services: ['Premium Rooms', '24/7 Doctor Visit', 'All Meals', 'Special Care']},
+                    Silver: {price: '$3000', services: ['Deluxe Rooms', 'Daily Doctor Visit', 'All Meals']},
+                    Bronze: {price: '$1500', services: ['Standard Rooms', 'Regular Check-ups']}
+                }
+            },
+            'Fortis Hospital': {
+                name: 'Fortis Hospital',
+                image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                packages: {
+                    Gold: {price: '$4500', services: ['Premium Rooms', '24/7 Doctor Visit', 'All Meals', 'Special Care']},
+                    Silver: {price: '$2800', services: ['Deluxe Rooms', 'Daily Doctor Visit', 'All Meals']},
+                    Bronze: {price: '$1300', services: ['Standard Rooms', 'Regular Check-ups']}
+                }
+            },
+            'Max Hospital': {
+                name: 'Max Hospital',
+                image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                packages: {
+                    Gold: {price: '$4800', services: ['Premium Rooms', '24/7 Doctor Visit', 'All Meals', 'Special Care']},
+                    Silver: {price: '$2900', services: ['Deluxe Rooms', 'Daily Doctor Visit', 'All Meals']},
+                    Bronze: {price: '$1400', services: ['Standard Rooms', 'Regular Check-ups']}
+                }
+            }
+        };
+
+        // Toggle dropdowns
+        document.querySelectorAll('#hospitalDropdown, #packageDropdown').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const panel = e.target.nextElementSibling;
+                panel.classList.toggle('active');
+            });
+        });
+
+        // Handle hospital and package selection
+        function updateDisplay() {
+            const selectedHospitals = Array.from(document.querySelectorAll('input[data-hospital]:checked'))
+                .map(cb => cb.dataset.hospital);
+            const selectedPackages = Array.from(document.querySelectorAll('input[data-package]:checked'))
+                .map(cb => cb.dataset.package);
+
+            const container = document.getElementById('hospitalDetails');
+            container.innerHTML = '';
+
+            selectedHospitals.forEach(hospitalName => {
+                const hospital = hospitalData[hospitalName];
+                selectedPackages.forEach(packageName => {
+                    const pkg = hospital.packages[packageName];
+                    const card = `
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <img src="${hospital.image}" class="w-full h-48 object-cover" alt="${hospital.name}">
+                            <div class="p-4">
+                                <h3 class="text-xl font-bold mb-2">${hospital.name}</h3>
+                                <div class="mb-2">
+                                    <span class="font-semibold">${packageName} Package</span>
+                                    <span class="text-green-600 float-right">${pkg.price}</span>
+                                </div>
+                                <ul class="text-sm text-gray-600">
+                                    ${pkg.services.map(service => `<li class="flex items-center gap-2">
+                                        <i class="bi bi-check-circle text-green-500"></i>${service}
+                                    </li>`).join('')}
+                                </ul>
+                                <button class="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', card);
+                });
+            });
+        }
+
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', updateDisplay);
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
